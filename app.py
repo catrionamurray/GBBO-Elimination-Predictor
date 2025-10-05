@@ -273,7 +273,7 @@ with tab3:
     st.subheader(f"Estimated Win Probabilities – Season {selected_season}")
     st.markdown("""
     Each line shows the model's estimated probability that a baker will ultimately
-    win, given their performance so far.  
+    win, given their performance so far.  We estimate this **super roughly** from the survival probabilities.
     Probabilities are normalized each week so that all remaining bakers sum to 1.
     """)
     
