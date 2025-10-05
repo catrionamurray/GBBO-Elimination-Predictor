@@ -19,7 +19,7 @@ selected_season = st.sidebar.selectbox("Select Season", season_list)
 # Tabs
 # ------------------------------------
 # tab1, tab2 = st.tabs(["📉 Elimination Risk", "🏆 Win Probabilities"])
-tab_intro, tab1, tab2, tab3 = st.tabs(["Introduction", "🍰 Elimination Risk", "💻 Feature Importance", "🏆 Win Probabilities",])
+tab_intro, tab1, tab2, tab3 = st.tabs(["Introduction", "🍰 Elimination Risk", "💻 Feature Importance", "🏆 Survival Probabilities",])
 
 
 
@@ -120,6 +120,7 @@ with tab1:
     )
     top3 = season_week_data.sort_values(by="Rank_in_Week")#.nsmallest(3, 'Rank_in_Week')
     top3=top3.set_index(top3["Rank_in_Week"])
+    top3['Final_Place'] = top3['Final_Place'].astype(int)
 
     st.table(top3[['Baker', 'Predicted_Elim_Prob', 'Actual_Eliminated']],)
 
@@ -138,6 +139,7 @@ with tab1:
 
     eliminated = season_data[season_data["Actual_Eliminated"] == 1]
     sb = season_data[season_data["is_SB"] == 1]
+    winner = season_data[(season_data["Final_Place"] == 1) &(season_data['Week']==10)]
 
     fig_elim.add_trace(
         go.Scatter(
@@ -156,6 +158,22 @@ with tab1:
             mode="markers",
             marker=dict(color="gold", size=8, symbol="star"),
             name="Star Baker",
+        )
+    )
+
+
+    fig_elim.add_trace(
+        go.Scatter(
+            x=winner["Week"],
+            y=winner["Baker"],
+            # mode="markers",
+            # marker=dict(color="green", size=8, symbol="diamond"),
+            mode='markers+text',
+            text=["👑"],  # crown on the last point
+            marker=dict(size=10, color='skyblue', symbol="star"),
+            # font=dict(size=14),
+            textposition='top center',
+            name="Winner",
         )
     )
 
@@ -270,7 +288,7 @@ with tab2:
 # TAB 3: Win Probabilities
 # ------------------------------------
 with tab3:
-    st.subheader(f"Estimated Win Probabilities – Season {selected_season}")
+    st.subheader(f"Estimated Survivial Probabilities – Season {selected_season}")
     st.markdown("""
     Each line shows the model's estimated probability that a baker will ultimately
     win, given their performance so far.  We estimate this **super roughly** from the survival probabilities.
@@ -311,7 +329,7 @@ with tab3:
         ['Baker', 'P_win_est_weekly_norm', 'Final_Place']
     ].sort_values('P_win_est_weekly_norm', ascending=False)
 
-    st.subheader("🏁 Semi-Final Win Predictions")
+    st.subheader("🏁 Final Win Predictions")
     st.table(final_probs.reset_index(drop=True))
 
     
